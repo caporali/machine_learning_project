@@ -1,0 +1,26 @@
+% math
+	\newcommand{\prob}[1]{\mathbb{P}\left(#1\right)}
+	\newcommand{\mean}[2][\kern0.5pt]{\mathbb{E}_{\kern1pt#1\kern-2pt}\left[#2\right]}
+	\newcommand{\given}{\, | \,}
+	\newcommand{\var}[1]{\operatorname{Var}\left(#1\right)}
+	\newcommand{\cov}[2]{\operatorname{Cov}\left(#1, #2\right)}
+	\newcommand{\kl}[1]{\operatorname{KL}\left(#1\right)}
+	\newcommand{\jsd}[1]{\operatorname{JSD}\left(#1\right)}
+	\newcommand{\activation}[1]{\text{\texttt{#1}}}
+	\newcommand{\normal}[3][\kern2.5pt]{\mathcal{N}^{#1\kern-3pt}\left(#2, #3\right)}
+	\newcommand{\real}{\mathbb{R}}
+	\newcommand{\integer}{\mathbb{Z}}
+	\renewcommand{\natural}{\mathbb{N}}
+	\renewcommand{\log}[1]{\operatorname{log}\left(#1\right)}
+	\newcommand{\supp}[1]{\operatorname{supp}\left(#1\right)}
+	\let\oldsim\sim
+	\renewcommand{\sim}{\,\oldsim\,}
+	\DeclareMathOperator*{\argmax}{arg\,max}
+	\DeclareMathOperator*{\argmin}{arg\,min}
+	% swap \varepsilon and \epsilon
+		\let\originalepsilon\epsilon
+		\let\epsilon\varepsilon
+		\let\otherepsilon\originalepsilon
+	% redefine \forall adding some space
+		\let\oldforall\forall
+		\renewcommand{\forall}{\oldforall\,}

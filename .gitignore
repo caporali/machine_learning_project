@@ -1,3 +1,11 @@
 ml_project_env_3.11
 data/MNIST
 python_info.txt
+beamer/slides_ml.aux
+beamer/slides_ml.bbl
+beamer/slides_ml.log
+beamer/slides_ml.nav
+beamer/slides_ml.out
+beamer/slides_ml.snm
+beamer/slides_ml.synctex.gz
+beamer/slides_ml.toc
