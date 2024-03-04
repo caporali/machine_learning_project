@@ -1,2 +1,2 @@
-optimization = sgd
+optimization = sgdm
 n_epochs = 100000

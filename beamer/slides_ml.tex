@@ -160,7 +160,6 @@
 
 \begin{document}
 
-	% title slide
 	\firstpage
 
 	\section{Definitions}
@@ -218,67 +217,9 @@
 			Under the (unrealistic) assumption of being able to find the optimal discriminator $D^*_G \coloneqq \max_{D} V(D, G)$, it is possible to show that iteratively alternating computations of $D^*_G$ and updates of $G$ (to minimize $V(D^*_G, G)$), one would obtain $p_G = p_{\text{\texttt{data}}}$.
 		\end{block}
 	\end{frame}
-
-	\section{Training}
-
-	\begin{frame}
-		\SetNlSty{texttt}{}{.}
-		\SetAlgoNlRelativeSize{-1}
-		\setlength{\algomargin}{2em}
-		\begin{algorithm}[H]
-			% caption
-			\caption{\vspace{-0.07cm}\textbf{Algorithm.} Minibatch SGD for training $D$ and $G$}
-			% format
-			\DontPrintSemicolon
-			\SetKwBlock{Function}{function}{end function}
-			% algorithm
-			\Function($\textit{\texttt{train}}{(D, G, \textit{\texttt{data}}, k, \textit{\texttt{n\_epochs}})}$){
-				\For{$\texttt{epoch} \textnormal{\textbf{ in }} 1, \dots, \texttt{n\_epochs}$}
-				{
-					\For{$\_ \textnormal{\textbf{ in }} 1, \dots, k$}
-					{
-						sample $\mathbf{z} = (z_i)_{i = 1}^{m}, \, z_i \sim p_{\texttt{noise}}$ \;
-						sample $\mathbf{x} = (x_i)_{i = 1}^{m}, \, x_i \sim p_{\texttt{data}}$ \;
-						$\theta_G = \theta_G + \lambda \, \nabla_{\theta_G} \widehat{V}_m(D, G)$ \;
-					}
-				sample $\mathbf{z} = (z_i)_{i = 1}^{m}, \, z_i \sim p_{\texttt{noise}}$ \;
-				$\theta_D = \theta_D - \lambda \, \nabla_{\theta_D} \widehat{V}_m(D, G)$ \;
-				}
-				\Return{D, G}
-			}
-		\end{algorithm}
-		\medskip 
-		Where the sample mean of the loss $V(D, G)$ is computed on the $m$-dimensional minibatches $\mathbf{z}, \mathbf{x}$:
-		\vspace{-0.2cm}
-		\begin{equation*}
-			\widehat{V}_m(D, G) \coloneqq \frac{1}{m} \sum_{i = 1}^{m} \log{D(x_i)} + \frac{1}{m} \sum_{i = 1}^{m} \log{1 - D(G(z_i))}.
-		\end{equation*}
-	\end{frame}
-
+	
 	% Note:
 	% As remarked, the unrealistic assumption of finding the optimal discriminator is solved in practical implementations. Instead we proceed alternating k optimization steps of D with 1 optimization step of G. This is similar to what happens when we implement Markov Chains algorithms, in this way it is possible to let the sampling distribution p_G to slowly converge to the stationary distribution of the chain.
-
-	\begin{frame}
-		\begin{block}{Remark}
-			Actual implementation:
-			\begin{itemize}
-				\item[-] 
-					{\color{Main}{\textit{$6$\textsuperscript{th} line.}}} It is performed one step of the ascent of the stochastic gradient via backpropagation, with loss 
-					\vspace{-0.3cm}
-					\begin{equation*}
-						\widehat{V}_m(D {\transparent{0.3}{, G}}) = \frac{1}{m} \sum_{i = 1}^{m} \log{D(x_i)} + \log{1 - D(G(z_i))};
-					\end{equation*}
-					\vspace{-0.6cm}
-				\item[-] 
-				{\color{Main}{\textit{$8$\textsuperscript{th} line.}}} Instead of one step of the ascent of $\widehat{V}_m({\transparent{0.3}{D,}} \, G)$ we, equivalently, do a step of descent with loss 
-					\vspace{-0.3cm}
-					\begin{equation*}
-						\frac{1}{m} \sum_{i = 1}^{m} \log{D(G(z_i))};
-					\end{equation*}
-			\end{itemize}
-			\textit{Note.} The classical SGD is often substituted by SGD with momentum or adaptative algorithm (like ADAM).
-		\end{block}
-	\end{frame}
 
 	\section{Theoretical guarantees}
 
@@ -296,7 +237,7 @@
 				Thanks to the Radon-Nikodym Theorem we have 
 				\vspace{-0.2cm}
 				\begin{equation*}
-					\mean[z \sim p_\text{\texttt{noise}}]{\log{1 - D(G(z))}} = \mean[x \sim p_G]{\log{1 - D(x)}};
+					\mean[z \sim p_\text{\texttt{noise}}]{\log{1 - D(G(z))}} = \mean[x \sim p_G]{\log{1 - D(x)}}.
 				\end{equation*}
 			\item 
 				Hence we can rewrite $V(D, G)$ as
@@ -388,23 +329,85 @@
 		\begin{block}{Remark}
 			Note that the algorithm used to train the GANs does not optimize the underlying distribution of $G$, $p_G$, but the parameters of a neural net, $\theta_G$. \\
 			\medskip
-			This raises theoretical problems, but the performance of the model are impressive, therefore GANs are reasonable to be used in practice.
+			This raises theoretical problems, anyway the performances of the model are impressive, therefore GANs are reasonable to be used in practice.
+		\end{block}
+	\end{frame}
+
+	
+	\section{Training}
+
+	\begin{frame}
+		\SetNlSty{texttt}{}{.}
+		\SetAlgoNlRelativeSize{-1}
+		\setlength{\algomargin}{2em}
+		\begin{algorithm}[H]
+			% caption
+			\caption{\vspace{-0.07cm}\textbf{Algorithm.} Minibatch SGD for training $D$ and $G$}
+			% format
+			\DontPrintSemicolon
+			\SetKwBlock{Function}{function}{end function}
+			% algorithm
+			\Function($\textit{\texttt{train}}{(D, G, \textit{\texttt{data}}, k, \textit{\texttt{n\_epochs}})}$){
+				\For{$\texttt{epoch} \textnormal{\textbf{ in }} 1, \dots, \texttt{n\_epochs}$}
+				{
+					\For{$\_ \textnormal{\textbf{ in }} 1, \dots, k$}
+					{
+						sample $\mathbf{z} = (z_i)_{i = 1}^{m}, \, z_i \sim p_{\texttt{noise}}$ \;
+						sample $\mathbf{x} = (x_i)_{i = 1}^{m}, \, x_i \sim p_{\texttt{data}}$ \;
+						$\theta_G = \theta_G + \lambda \, \nabla_{\theta_G} \widehat{V}_m(D, G)$ \;
+					}
+				sample $\mathbf{z} = (z_i)_{i = 1}^{m}, \, z_i \sim p_{\texttt{noise}}$ \;
+				$\theta_D = \theta_D - \lambda \, \nabla_{\theta_D} \widehat{V}_m(D, G)$ \;
+				}
+				\Return{D, G}
+			}
+		\end{algorithm}
+		\medskip 
+		Where the sample mean of the loss $V(D, G)$ is computed on the $m$-dimensional minibatches $\mathbf{z}, \mathbf{x}$:
+		\vspace{-0.2cm}
+		\begin{equation*}
+			\widehat{V}_m(D, G) \coloneqq \frac{1}{m} \sum_{i = 1}^{m} \log{D(x_i)} + \frac{1}{m} \sum_{i = 1}^{m} \log{1 - D(G(z_i))}.
+		\end{equation*}
+	\end{frame}
+
+	\begin{frame}
+		\begin{block}{Remark}
+			Actual implementation:
+			\begin{itemize}
+				\item[-] 
+					{\color{Main}{\textit{$6$\textsuperscript{th} line.}}} It is performed one step of the ascent of the stochastic gradient via backpropagation, with loss 
+					\vspace{-0.3cm}
+					\begin{equation*}
+						\widehat{V}_m(D {\transparent{0.3}{, G}}) = \frac{1}{m} \sum_{i = 1}^{m} \log{D(x_i)} + \log{1 - D(G(z_i))};
+					\end{equation*}
+					\vspace{-0.6cm}
+				\item[-] 
+				{\color{Main}{\textit{$8$\textsuperscript{th} line.}}} Instead of one step of the ascent of $\widehat{V}_m({\transparent{0.3}{D,}} \, G)$ we, equivalently, do a step of descent with loss 
+					\vspace{-0.3cm}
+					\begin{equation*}
+						\frac{1}{m} \sum_{i = 1}^{m} \log{D(G(z_i))};
+					\end{equation*}
+			\end{itemize}
+			\textit{Note.} The classical SGD is often substituted by SGD with momentum or adaptative algorithm (like ADAM).
 		\end{block}
 	\end{frame}
 
 	\section{Simulations}
 
 	\begin{frame}
-		We performed practical simuations, training and generating data using GANs. The dataset used as train set is \texttt{MNIST}, a database of $60000$ images of handwritten digits.
+		We performed practical simuations, training and generating data using GANs (based on the work of \citeauthor{vandegarweb}). \\
+		\medskip
+		The dataset used as train set is \texttt{MNIST}, a database of $60000$ images of handwritten digits.
 		\begin{figure}[H]
 			\begin{center}
 				% [trim = {left bottom right top}, clip]
-				\includegraphics[scale = 0.3, trim = {0 3cm 0 3cm},clip]{head_mnist_data.pdf}
+				\includegraphics[scale = 0.28, trim = {0 3cm 0 3cm},clip]{head_mnist_data.pdf}
 			\end{center}
 		\end{figure}
 	\end{frame}
 
 	\begin{frame}
+		\vspace{0.3cm}
 		Generated samples obtained after $10^{4}$ and $10^{5}$ epochs of training using nets $D$, $G$ with architectures $\alpha_D$, $\alpha_G$:
 		\vspace{-0.1cm}	
 		\begin{align*}
@@ -416,12 +419,12 @@
 			\begin{center}
 				% [trim = {left bottom right top}, clip]
 				\begin{subfigure}{0.45\textwidth}
-					\includegraphics[scale = 0.24, trim = {3cm 3cm 3cm 3cm},clip]{regenerated_mnist_data_10000.pdf}
+					\includegraphics[scale = 0.23, trim = {3cm 3cm 3cm 3cm},clip]{regenerated_mnist_data_10000.pdf}
 					\caption{$10^{4}$ epochs}
 				\end{subfigure}
 				\hspace{0.2cm}
 				\begin{subfigure}{0.45\textwidth}
-					\includegraphics[scale = 0.24, trim = {3cm 3cm 3cm 3cm},clip]{regenerated_mnist_data_100000.pdf}
+					\includegraphics[scale = 0.23, trim = {3cm 3cm 3cm 3cm},clip]{regenerated_mnist_data_100000.pdf}
 					\caption{$10^{5}$ epochs} 
 				\end{subfigure}
 			\end{center}
@@ -435,197 +438,5 @@
 		\bibliographystyle{plainnat}
 		\bibliography{files/bibliography}
 	\end{frame}
-
-	% 2/3 codice e immagini
-
-
-		% definition and notation
-		% \begin{frame}
-		% 	\begin{alertblock}{Definition (Fully connected feed-forward Neural Network (NN))}
-		% 		A NN is defined through an architecture
-		% 			\vskip -0.6cm
-		% 			\begin{equation*}
-		% 				\alpha = (l, n, \varphi) \text{ with } \mathbf{n} = (n_0, \dots, n_{l + 1}) \in \natural^{l + 2} \text{ and } \varphi: \real \to \real
-		% 			\end{equation*}
-		% 			\vskip -0.15cm
-		% 		respectively corresponding to width, array of depths and activation function. \\
-		% 		Then, $\forall x \in \real^{n_0}$, the network is defined as
-		% 			\vskip -0.1cm
-		% 			\begin{equation*}
-		% 				\begin{aligned}
-		% 					f(x) &= W^{(l + 1)} \varphi(z_l) + b^{(l + 1)}, \\
-		% 					z_k &= W^{(k)} \varphi(z_{k - 1}) + b^{(k)} \text{ for } k \in \{2, \dots, l\}, \\
-		% 					z_1 &= W^{(1)} x + b^{(1)},
-		% 				\end{aligned}
-		% 			\end{equation*}
-		% 	\end{alertblock}
-		% \end{frame}
-
-		% \section{\scshape{Bayesian Neural Networks}}
-
-		% % bayesian inference
-		% \begin{frame}
-		% 	\vfill
-		% 	Given $f$ as above, we define $\theta \in \real^t$ as the flattened concatenation of the parameters (both weights and biases). \\
-		% 	Now we can start talking of Bayesian Neural Networks (BNNs).
-		% 	\vfill
-		% 	The idea is to exploit Bayesian inference in a supervised setting. \\
-		% 	Given a dataset $\left\{\mathbf{x}, \mathbf{y}\right\} = \left\{\left(x_n, y_n\right)\right\}_{n = 1}^{N}$ it holds
-		% 		\vskip -0.1cm
-		% 		\begin{equation*}
-		% 			p_{\theta|\mathbf{x}, \mathbf{y}}(\theta) = \frac{p_{\mathbf{y}|\theta}(\mathbf{y}) \cdot p_{\theta}(\theta)}{p_{\mathbf{y}}(\mathbf{y})},
-		% 		\end{equation*}
-		% 		\vskip -0.05cm		
-		% 	hence we are interested in the two terms of the r.h.s. numerator:
-		% 	\vskip -0cm
-		% 	\begin{itemize}
-		% 		\item \textit{prior} distribution on $\theta$, $p_{\theta}(\theta)$;
-		% 		\item \textit{likelihood} distribution, $p_{\mathbf{y}|\theta}(\mathbf{y})$.
-		% 	\end{itemize}
-		% 	\vfill
-		% \end{frame}
-
-		% % prior
-		% \begin{frame}
-		% 	Possible prior distributions $P$ on $\theta$. \\
-		% 	Let $\sigma_W^2$ and $\sigma_b^2$ be positive real numbers, $\forall i, j$ suitable we define:
-		% 	\begin{block}{Gaussian i.i.d. prior \hfill [\citeauthor{neal1996} and \citeauthor{matthews2018}]}
-		% 		\vskip -0.7cm
-		% 		\begin{equation*}
-		% 			W^{(k)}_{i, j} \sim \normal{0}{\frac{\sigma_W^2}{n_{k - 1}}}, \
-		% 			b^{(k)}_{i} \sim \normal{0}{\sigma_b^2}, \ \forall k \in \{1, \dots, l + 1\},
-		% 		\end{equation*}
-		% 		\vskip -0.3cm
-		% 	\end{block}
-		% 	\begin{block}{Trace-class prior \hfill [\citeauthor{sell2023}]}
-		% 		\vskip -0.7cm
-		% 		\begin{equation*}
-		% 			\begin{gathered}
-		% 				W^{(1)}_{i, j} \sim \normal{0}{\frac{\sigma_W^2}{i^{\alpha}}}, \
-		% 				W^{(l + 1)}_{i, j} \sim \normal{0}{\frac{\sigma_W^2}{j^{\alpha}}}, \\
-		% 				W^{(k)}_{i, j} \sim \normal{0}{\frac{\sigma_W^2}{(ij)^{\alpha}}} \text{ for } k \in \{2, \dots, l\}, \\
-		% 				b^{(k)}_{i} \sim \normal{0}{\frac{\sigma_b^2}{i^{\alpha}}} \text{ for } k \in \{1, \dots, l\}, \
-		% 				b^{(l + 1)}_{i} \sim \normal{0}{\sigma_b^2}.
-		% 			\end{gathered}
-		% 		\end{equation*}
-		% 		\vskip -0.3cm
-		% 	\end{block}
-		% \end{frame}
-
-		% % convergence to NNGP
-		% \begin{frame}
-		% 	\begin{alertblock}{Theorem (convergencence to the Neural Network Gaussian process (NNGP)) \hfill [\citeauthor{matthews2018}]}
-		% 		Let $(f_m)_{m \in \natural_0}$ be a sequence of BNNs with 
-		% 		\begin{itemize}
-		% 			\item Gaussian i.i.d. prior,
-		% 			\item shared sub-linear continuous activation function,
-		% 			\item the width of the network sequence divergent for $m \to \infty$.
-		% 			% note:
-		% 			% when I say "with the width of the network sequence divergent", I mean that the number of neurons in each of the hidden layer diverges.
-		% 		\end{itemize}
-		% 		Let $(x_n)_{n = 1}^{\infty} \subset \real^{n_0}$ countable input set, it holds 
-		% 			\vspace{-0.2cm}
-		% 			\begin{equation*}	
-		% 				\left(f_m(x_n)\right)_{n = 1}^{\infty} \xrightarrow[m \to \infty]{\mathcal{L}} \normal[\infty]{0}{K^{(*)}}.
-		% 			\end{equation*}
-		% 			\vspace{-0.3cm}
-		% 	\end{alertblock}
-		% 	Hence the \textit{prior predictive} (with Gaussian i.i.d. prior) of a BNN converges to a specific Gaussian process: the NNGP prior.
-		% 	% note:
-		% 	% the proof ot the theorem consists in an induction on the layers of the network and exploits two major results: De Finetti's Theorem and a Central Limit Theorem (CLT) for exchangeable random variable (the neurons are exchangeable).
-		% \end{frame}
-
-		% % likelihood
-		% \begin{frame}
-		% 	\reducedspacing{To fully define a BNN we also need a likelihood, a natural choice:} \\
-		% 	\begin{block}{Homoscedastic Gaussian likelihood}
-		% 		Given $\mathbf{y} \coloneqq \left(y_n\right)_{n = 1}^{N}$ the set of outputs of our dataset we assume 
-		% 		\vspace{-0.2cm}
-		% 		\begin{equation*}
-		% 			\mathbf{y} \given \theta \sim \normal[N \times n_l]{\big(f(x_n)\big)_{n = 1}^N}{\sigma_y^2 I}, \text{ with } \sigma_y^2 \in (0, \infty).
-		% 		\end{equation*}
-		% 		\vspace{-0.4cm}
-		% 	\end{block}
-		% 	\begin{alertblock}{Remark}
-		% 		Now we have all the tools to determine the \textit{posterior} $p_{\theta|\mathbf{x}, \mathbf{y}}$ and, consequently the \textit{posterior predictive}. \\
-		% 		\textbf{Major issue:} the marginal likelihood is difficult to evaluate due to high dimensionality of the problem
-		% 			\vspace{-0.2cm}
-		% 			\begin{equation*}
-		% 				p_\mathbf{y}(\mathbf{y}) = \int_{\Theta} p_\mathbf{y|\theta}(\mathbf{y}) p_{\theta}({\theta}) d\theta.
-		% 			\end{equation*}
-		% 			\vspace{-0.4cm}
-		% 	\end{alertblock}
-		% \end{frame}
-
-		% \section{\scshape{Variational inference}}
-		
-		% % mean-field variational inference
-		% \begin{frame}
-		% 	\vfill
-		% 	\textbf{Solution:} it is possible to directly compute an \textit{approximate posterior} through mean-field variational inference (MFVI).
-		% 	\vfill
-		% 	\begin{block}{Mean-field variational inference (MFVI)}
-		% 		The goal is to approximate the true posterior $Q$, looking for $Q^*$ that maximizes the evidence lower bound (ELBO), inside a tractable, fully factorized family $\mathcal{Q}$. \\
-		% 		\medskip
-		% 		More explicitely we look for an \textit{approximate posetrior} $Q^*$ s.t.
-		% 			\vskip -0.3cm
-		% 			\begin{equation*}
-		% 				Q^* \coloneqq \argmax_{R \in \mathcal{Q}} \elbo(R)
-		% 			\end{equation*}
-		% 			\vskip -0.3cm
-		% 		with
-		% 			\vskip -0.3cm
-		% 			\begin{equation*}
-		% 				\elbo(R) \coloneqq \mean[\theta \sim R]{\log\left(p_\mathbf{y|\theta}(\mathbf{y})\right)} - \kl{R}{P},
-		% 			\end{equation*}
-		% 			\vskip -0.3cm
-		% 		and
-		% 			\vskip -0.4cm
-		% 			\begin{equation*}
-		% 				\mathcal{Q} \coloneqq \left\{\normal[t]{\mu_R}{\mathtt{diag}(\sigma_R^2)} \given \mu_R \in \real^{t}, \sigma_R^2 \in (0, \infty)^t\right\}.
-		% 			\end{equation*}
-		% 	\end{block}	
-		% 	\vfill
-		% \end{frame}
-		
-		% % mean-field BNNs ignore the data
-		% \begin{frame}
-		% 	\textbf{Issue:} \citeauthor{coker2022} showed that MFVI does not always perform well for large BNNs.
-		% 	\begin{alertblock}{Theorem (wide mean-field BNNs ignore the data) \hfill [\citeauthor{coker2022}]}
-		% 		Consider a sequence of BNNs endowed with
-		% 		\begin{itemize}
-		% 			\item Gaussian i.i.d. priors, $(P_m)_{m \in \natural_0}$, 
-		% 			\item homoscedastic Gaussian likelihooods,
-		% 			\item a common odd, Lipshitz activation function.
-		% 		\end{itemize}
-		% 		Let $(Q_m^*)_{m \in \natural_0}$ be a sequence of optimal MFVI posterior distributions and $\left(f_{Q_m^*}\right)_{m \in \natural_0}$ be the induced sequence of predictive distribution. \\
-		% 		Along any finite-dimensional distribution
-		% 			\vskip -0.2cm
-		% 			\begin{equation*}
-		% 				f_{Q_m^*} \xrightarrow{m \to \infty} \text{NNGP prior}.
-		% 			\end{equation*}
-		% 			\vskip -0cm
-		% 	\end{alertblock}
-		% \end{frame}
-
-		% % conjecture
-		% \begin{frame}
-		% 	\textbf{Objective:} prove rigorously that using BNNs with trace-class priors, MFVI correctly approximate the posterior distribution.
-		% 	\begin{alertblock}{Conjecture}
-		% 		Consider a sequence of BNNs endowed with
-		% 		\begin{itemize}
-		% 			\item trace-class priors, $(P_m)_{m \in \natural_0}$, 
-		% 			\item homoscedastic Gaussian likelihooods,
-		% 			\item a common Lipshitz activation function.
-		% 		\end{itemize}
-		% 		Let $(Q_m^*)_{m \in \natural_0}$ be a sequence of optimal MFVI posterior distributions and $\left(f_{Q_m^*}\right)_{m \in \natural_0}$ be the induced sequence of predictive distribution. \\
-		% 		Along any finite-dimensional distribution
-		% 			\vskip -0.2cm
-		% 			\begin{equation*}
-		% 				f_{Q_m^*} \xrightarrow{m \to \infty} \text{NNGP posterior}.
-		% 			\end{equation*}
-		% 			\vskip -0cm
-		% 	\end{alertblock}
-		% \end{frame}
 
 \end{document}
