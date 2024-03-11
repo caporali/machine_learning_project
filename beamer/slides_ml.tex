@@ -354,10 +354,10 @@
 					{
 						sample $\mathbf{z} = (z_i)_{i = 1}^{m}, \, z_i \sim p_{\texttt{noise}}$ \;
 						sample $\mathbf{x} = (x_i)_{i = 1}^{m}, \, x_i \sim p_{\texttt{data}}$ \;
-						$\theta_G = \theta_G + \lambda \, \nabla_{\theta_G} \widehat{V}_m(D, G)$ \;
+						$\theta_D = \theta_D + \lambda \, \nabla_{\theta_D} \widehat{V}_m(D, G)$ \;
 					}
 				sample $\mathbf{z} = (z_i)_{i = 1}^{m}, \, z_i \sim p_{\texttt{noise}}$ \;
-				$\theta_D = \theta_D - \lambda \, \nabla_{\theta_D} \widehat{V}_m(D, G)$ \;
+				$\theta_G = \theta_G - \lambda \, \nabla_{\theta_G} \widehat{V}_m(D, G)$ \;
 				}
 				\Return{D, G}
 			}
