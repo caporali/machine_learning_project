@@ -214,7 +214,7 @@
 			\min_{G} {\transparent{0.3}{\max_{D}}} \ \cancel{\mean[x \sim p_\text{\texttt{data}}]{\log{D(x)}}} + \underbrace{\mean[z \sim p_\text{\texttt{noise}}]{\log{1 - D(G(z))}}}_{D(G(z)) \ \approx \ 1}.
 		\end{equation*}
 		\begin{block}{Remark}
-			Under the (unrealistic) assumption of being able to find the optimal discriminator $D^*_G \coloneqq \max_{D} V(D, G)$, it is possible to show that iteratively alternating computations of $D^*_G$ and updates of $G$ (to minimize $V(D^*_G, G)$), one would obtain $p_G = p_{\text{\texttt{data}}}$.
+			Under the (unrealistic) assumption of being able to find the optimal discriminator $D^*_G \coloneqq \argmax_{D} V(D, G)$, we can show that alternating computations of $D^*_G$ and updates of $G$ (to minimize $V(D^*_G, G)$), one would obtain $p_G = p_{\text{\texttt{data}}}$.
 		\end{block}
 	\end{frame}
 	
@@ -382,7 +382,7 @@
 					\end{equation*}
 					\vspace{-0.6cm}
 				\item[-] 
-				{\color{Main}{\textit{$8$\textsuperscript{th} line.}}} Instead of one step of the ascent of $\widehat{V}_m({\transparent{0.3}{D,}} \, G)$ we, equivalently, do a step of descent with loss 
+				{\color{Main}{\textit{$8$\textsuperscript{th} line.}}} Instead of one step of the descent of $\widehat{V}_m({\transparent{0.3}{D,}} \, G)$ we, equivalently, do a step of ascent with loss 
 					\vspace{-0.3cm}
 					\begin{equation*}
 						\frac{1}{m} \sum_{i = 1}^{m} \log{D(G(z_i))};
