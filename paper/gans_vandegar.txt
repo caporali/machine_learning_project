@@ -1,2 +1,0 @@
-GitHub repository Papers-in-100-Lines-of-Code:
-	https://github.com/MaximeVandegar/Papers-in-100-Lines-of-Code/tree/main/Generative_Adversarial_Networks
